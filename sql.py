@@ -27,9 +27,43 @@ class Article(db.Model):
 db.create_all()
 
 
+def add():
+    a = Article(title='aaa', content='bbb')
+    db.session.add(a)
+    db.session.commit()
+
+
+def search():
+    s = Article.query.filter(Article.id == 1)
+
+    print(s)
+
+    # SELECT article.id AS article_id, article.title AS article_title, article.content
+    # AS article_content FROM article WHERE article.id = % s
+
+    a = s.all()[0]  # a = s.first()
+
+    print(a.title, a.content)
+
+    # aaa bbb
+
+
+def modify():
+    article = Article.query.filter(Article.id == 1).first()
+    article.title = 'ccc'
+    db.session.commit()
+
+
+def delete():
+    article = Article.query.filter(Article.id == 1).first()
+    db.session.delete(article)
+    db.session.commit()
+
+
 @app.route('/')
 def index():
-    return render_template('index.html')
+    delete()
+    return 'Hello world'
 
 
 app.run()
