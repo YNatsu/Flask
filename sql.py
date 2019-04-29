@@ -14,7 +14,14 @@ import config
 app = Flask(__name__)
 
 app.config.from_object(config)
+
 db = SQLAlchemy(app=app)
+
+
+class User(db.Model):
+    __tablename__ = 'user'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(100), nullable=False)
 
 
 class Article(db.Model):
@@ -22,6 +29,15 @@ class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(100), nullable=False)
     content = db.Column(db.Text, nullable=False)
+
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    author = db.relationship('User', backref=db.backref('articles'))
+
+    # 可进行如下创建
+
+    # a = Article(title='a', content='b')
+    # a.author = User.query.filter(User.id == 1).first()
 
 
 db.create_all()
@@ -34,6 +50,8 @@ def add():
 
 
 def search():
+    # 单表查询
+
     s = Article.query.filter(Article.id == 1)
 
     print(s)
@@ -46,6 +64,22 @@ def search():
     print(a.title, a.content)
 
     # aaa bbb
+
+    # 多表查询
+
+    # 必需设置 relationship
+
+    # Article => User
+
+    a = Article.query.filter(Article.id == 1).first()
+
+    print(a.author.name)
+
+    # User => Article
+
+    u = User.query.filter(User.id == 1).first()
+
+    print(u.articles)
 
 
 def modify():
@@ -62,7 +96,6 @@ def delete():
 
 @app.route('/')
 def index():
-    delete()
     return 'Hello world'
 
 
