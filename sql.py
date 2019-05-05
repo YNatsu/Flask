@@ -24,11 +24,22 @@ class User(db.Model):
     name = db.Column(db.String(100), nullable=False)
 
 
+# article 与 tag 表 多对多联系
+
+article_tag = db.Table(
+    'article_tag',
+    db.Column('article_id', db.Integer, db.ForeignKey('article.id'), primary_key=True),
+    db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'), primary_key=True),
+)
+
+
 class Article(db.Model):
     __tablename__ = 'article'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(100), nullable=False)
     content = db.Column(db.Text, nullable=False)
+
+    # 外键 一对多
 
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
@@ -37,7 +48,22 @@ class Article(db.Model):
     # 可进行如下创建
 
     # a = Article(title='a', content='b')
+
     # a.author = User.query.filter(User.id == 1).first()
+
+    # 多对多
+
+    tags = db.relationship('Tag', secondary=article_tag, backref='articles')
+
+    # 可进行如下创建
+
+    # article1.tags.append(tag1)
+
+
+class Tag(db.Model):
+    __tablename__ = 'tag'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(100), nullable=False)
 
 
 db.create_all()
